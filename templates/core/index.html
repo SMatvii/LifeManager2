@@ -1,0 +1,266 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Головний банер -->
+    <section class="gradient-primary text-white py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center fade-in">
+                <!-- Лого та заголовок -->
+                <div class="flex justify-center mb-8">
+                    <div class="floating">
+                        <img src="/static/logo.svg" alt="LifeManager Logo" class="w-32 h-32 shadow-glow">
+                    </div>
+                </div>
+                
+                <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                    Ласкаво просимо до 
+                    <span class="text-gradient bg-gradient-to-r from-yellow-400 to-orange-500">
+                        LifeManager
+                    </span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-3xl mx-auto">
+                    Ваш особистий помічник для управління подіями та фінансами. 
+                    Організуйте своє життя ефективно та досягайте більшого!
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-success">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                            Перейти до панелі
+                        </a>
+                    {% else %}
+                        <button onclick="document.getElementById('registerModal').classList.add('show')" 
+                                class="btn btn-success">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <line x1="19" y1="8" x2="19" y2="14"/>
+                                <line x1="22" y1="11" x2="16" y2="11"/>
+                            </svg>
+                            Почати безкоштовно
+                        </button>
+                        
+                        <button onclick="document.getElementById('loginModal').classList.add('show')" 
+                                class="glass-effect btn text-white hover:bg-white hover:bg-opacity-20">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10,17 15,12 10,7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            Увійти в систему
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Особливості -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Чому обирають LifeManager?
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Потужні інструменти для організації вашого життя в одному місці
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Управління подіями -->
+                <div class="card card-gradient text-center">
+                    <div class="w-16 h-16 gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 pulse-animation">
+                        <svg class="icon-lg text-white" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Управління подіями</h3>
+                    <p class="text-gray-600 mb-6">
+                        Плануйте та відстежуйте ваші події з можливістю зміни статусу. 
+                        Ніколи не забувайте про важливі зустрічі та завдання.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Календарне планування
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Статуси подій
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Нагадування
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Фінансовий трекер -->
+                <div class="card card-gradient text-center">
+                    <div class="w-16 h-16 gradient-success rounded-2xl flex items-center justify-center mx-auto mb-6 pulse-animation">
+                        <svg class="icon-lg text-white" viewBox="0 0 24 24">
+                            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/>
+                            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Фінансовий трекер</h3>
+                    <p class="text-gray-600 mb-6">
+                        Відстежуйте доходи та витрати з детальною аналітикою. 
+                        Контролюйте свій бюджет та досягайте фінансових цілей.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Категорії витрат
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Бюджетування
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Звіти та графіки
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Аналітика -->
+                <div class="card card-gradient text-center">
+                    <div class="w-16 h-16 gradient-warning rounded-2xl flex items-center justify-center mx-auto mb-6 pulse-animation">
+                        <svg class="icon-lg text-white" viewBox="0 0 24 24">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Звіти та аналітика</h3>
+                    <p class="text-gray-600 mb-6">
+                        Детальні звіти та графіки для аналізу ваших даних. 
+                        Приймайте обґрунтовані рішення на основі статистики.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Інтерактивні графіки
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Місячні звіти
+                        </div>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="icon text-green-500 mr-3" viewBox="0 0 24 24">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            Експорт даних
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Статистика -->
+    <section class="py-20 gradient-primary text-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">LifeManager в цифрах</h2>
+                <p class="text-xl text-indigo-100">Приєднуйтесь до тисяч задоволених користувачів</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-5xl font-bold mb-2 pulse-animation">10K+</div>
+                    <div class="text-indigo-200">Активних користувачів</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold mb-2 pulse-animation">50K+</div>
+                    <div class="text-indigo-200">Створених подій</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold mb-2 pulse-animation">100K+</div>
+                    <div class="text-indigo-200">Відстежених транзакцій</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold mb-2 pulse-animation">99%</div>
+                    <div class="text-indigo-200">Задоволених користувачів</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Заклик до дії -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="card shadow-glow">
+                <div class="floating mb-6">
+                    <img src="/static/logo.svg" alt="LifeManager Logo" class="w-20 h-20 mx-auto">
+                </div>
+                
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Готові почати?
+                </h2>
+                <p class="text-xl text-gray-600 mb-8">
+                    Приєднуйтесь до LifeManager сьогодні та почніть організовувати своє життя ефективніше
+                </p>
+                
+                {% if not user.is_authenticated %}
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="document.getElementById('registerModal').classList.add('show')" 
+                                class="btn btn-primary">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                            </svg>
+                            Почати безкоштовно
+                        </button>
+                        
+                        <button onclick="document.getElementById('loginModal').classList.add('show')" 
+                                class="btn btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                                <polyline points="10,17 15,12 10,7"/>
+                                <line x1="15" y1="12" x2="3" y2="12"/>
+                            </svg>
+                            Вже є акаунт?
+                        </button>
+                    </div>
+                {% else %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12,5 19,12 12,19"/>
+                        </svg>
+                        Перейти до панелі управління
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

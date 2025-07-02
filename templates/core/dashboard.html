@@ -1,0 +1,274 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Панель управління - LifeManager{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6" id="dashboard">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900">Панель управління</h2>
+            <p class="text-gray-600 mt-2">Огляд вашої активності та статистики</p>
+        </div>
+        <img src="/static/logo.svg" alt="LifeManager" class="w-12 h-12 floating">
+    </div>
+    
+    <!-- Статистичні картки -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="stats-cards">
+        <!-- Картки будуть додані через JavaScript -->
+    </div>
+
+    <!-- Графіки -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="card">
+            <div class="flex items-center mb-6">
+                <svg class="icon-lg text-blue-600 mr-3" viewBox="0 0 24 24">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900">Фінансова динаміка</h3>
+            </div>
+            <canvas id="financeChart" width="400" height="200"></canvas>
+        </div>
+        
+        <div class="card">
+            <div class="flex items-center mb-6">
+                <svg class="icon-lg text-green-600 mr-3" viewBox="0 0 24 24">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                    <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900">Статистика подій</h3>
+            </div>
+            <canvas id="eventsChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Останні активності -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card">
+            <div class="flex items-center mb-6">
+                <svg class="icon-lg text-purple-600 mr-3" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900">Найближчі події</h3>
+            </div>
+            <div id="upcoming-events">
+                <!-- Події будуть додані через JavaScript -->
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex items-center mb-6">
+                <svg class="icon-lg text-orange-600 mr-3" viewBox="0 0 24 24">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900">Останні транзакції</h3>
+            </div>
+            <div id="recent-transactions">
+                <!-- Транзакції будуть додані через JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Завантаження даних панелі
+    fetch('/api/dashboard-stats/')
+        .then(response => response.json())
+        .then(data => {
+            renderStatsCards(data);
+            renderUpcomingEvents(data.upcoming_events);
+            renderRecentTransactions(data.recent_transactions);
+            renderCharts(data);
+        })
+        .catch(error => console.error('Помилка завантаження даних:', error));
+
+    function renderStatsCards(data) {
+        const statsContainer = document.getElementById('stats-cards');
+        const { events_stats, finance_stats } = data;
+        
+        statsContainer.innerHTML = `
+            <div class="stat-card income">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Доходи</p>
+                        <p class="text-2xl font-bold text-green-600">
+                            ₴${finance_stats.total_income.toLocaleString()}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center">
+                        <svg class="icon text-white" viewBox="0 0 24 24">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card expense">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Витрати</p>
+                        <p class="text-2xl font-bold text-red-600">
+                            ₴${finance_stats.total_expense.toLocaleString()}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 gradient-danger rounded-lg flex items-center justify-center">
+                        <svg class="icon text-white" viewBox="0 0 24 24">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card balance">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Баланс</p>
+                        <p class="text-2xl font-bold ${finance_stats.balance >= 0 ? 'text-blue-600' : 'text-red-600'}">
+                            ₴${finance_stats.balance.toLocaleString()}
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 gradient-secondary rounded-lg flex items-center justify-center">
+                        <svg class="icon text-white" viewBox="0 0 24 24">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderUpcomingEvents(events) {
+        const container = document.getElementById('upcoming-events');
+        
+        if (events.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="icon-xl text-gray-300 mx-auto mb-4" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <p class="text-gray-500">Немає запланованих подій</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = events.map(event => `
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-3 hover:bg-gray-100 transition-colors">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 gradient-primary rounded-full mr-3"></div>
+                    <div>
+                        <p class="font-medium text-gray-900">${event.title}</p>
+                        <p class="text-sm text-gray-500">
+                            ${new Date(event.start_time).toLocaleDateString('uk-UA')}
+                        </p>
+                    </div>
+                </div>
+                <div class="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Заплановано
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderRecentTransactions(transactions) {
+        const container = document.getElementById('recent-transactions');
+        
+        if (transactions.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <svg class="icon-xl text-gray-300 mx-auto mb-4" viewBox="0 0 24 24">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <p class="text-gray-500">Немає транзакцій</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = transactions.map(transaction => `
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-3 hover:bg-gray-100 transition-colors">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 ${transaction.type === 'income' ? 'gradient-success' : 'gradient-danger'} rounded-full mr-3"></div>
+                    <div>
+                        <p class="font-medium text-gray-900">${transaction.title}</p>
+                        <p class="text-sm text-gray-500">
+                            ${new Date(transaction.date).toLocaleDateString('uk-UA')}
+                        </p>
+                    </div>
+                </div>
+                <div class="font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
+                    ${transaction.type === 'income' ? '+' : '-'}₴${transaction.amount.toLocaleString()}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderCharts(data) {
+        // Фінансовий графік
+        const financeCtx = document.getElementById('financeChart').getContext('2d');
+        new Chart(financeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Доходи', 'Витрати'],
+                datasets: [{
+                    data: [data.finance_stats.total_income, data.finance_stats.total_expense],
+                    backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                    borderColor: ['rgba(16, 185, 129, 1)', 'rgba(239, 68, 68, 1)'],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Графік подій
+        const eventsCtx = document.getElementById('eventsChart').getContext('2d');
+        new Chart(eventsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Заплановано', 'Завершено', 'Скасовано'],
+                datasets: [{
+                    data: [
+                        data.events_stats.planned,
+                        data.events_stats.completed,
+                        data.events_stats.cancelled
+                    ],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '60%'
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
