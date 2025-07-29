@@ -1,6 +1,4 @@
-# LifeManager - Python/Django Version
-
-![LifeManager Logo](static/logo.svg)
+# LifeManager - TypeScript Version
 
 Особистий помічник для управління подіями та фінансами, створений на Django з мінімальним використанням JavaScript.
 
